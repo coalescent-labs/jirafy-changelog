@@ -1,4 +1,10 @@
-[![Unit Tests](https://github.com/onXmaps/jirafy-changelog/actions/workflows/tests.yml/badge.svg)](https://github.com/onXmaps/jirafy-changelog/actions/workflows/tests.yml)
+> **Coalescent Labs notes**
+> 
+> This is a fork of [onXmaps/jirafy-changelog](https://github.com/onXmaps/jirafy-changelog) with the following changes:
+> 
+> * Upgrade action to Node 16
+> * Upgrade some dependencies
+
 # Jirafy Changelog
 This action generates a changelog from two references, where the markdown is formatted for any referenced Jira tickets.
 

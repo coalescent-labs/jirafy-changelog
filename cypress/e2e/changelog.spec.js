@@ -3,7 +3,7 @@ const { jirafyChangelog,
     toUpperJiraTickets, addJiraLinksToChangelog,
     stripBrackets, addCommaSpaceBetweenJiraTickets,
     surroundTicketListWithBrackets } = require('../../utils/changelog')
-const owner = 'onxmaps'
+const owner = 'coalescent-labs'
 const repo = 'jirafy-changelog'
 
 describe('Jirafy Changelog', () => {
