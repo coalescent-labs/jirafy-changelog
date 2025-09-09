@@ -2,8 +2,9 @@
 > 
 > This is a fork of [onXmaps/jirafy-changelog](https://github.com/onXmaps/jirafy-changelog) with the following changes:
 > 
-> * Upgrade action to Node 16
+> * Upgrade action to Node 24
 > * Upgrade some dependencies
+> * Upgrade CI action to latest stable
 
 # Jirafy Changelog
 This action generates a changelog from two references, where the markdown is formatted for any referenced Jira tickets.
@@ -65,7 +66,7 @@ jobs:
 
       - name: Jirafy Changelog
         id: changelog
-        uses: onXmaps/jirafy-changelog@v1.0.0
+        uses: onXmaps/jirafy-changelog@v4.0.0
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           jiraHost: ${{ secrets.JIRA_HOST }}
@@ -92,7 +93,7 @@ If you have two specific references you want:
 ```yaml
 - name: Jirafy Changelog
   id: changelog
-  uses: onXmaps/jirafy-changelog@v1.0.0
+  uses: onXmaps/jirafy-changelog@v4.0.0
   with:
     head-ref: 'v0.0.2'
     base-ref: 'v0.0.1'
