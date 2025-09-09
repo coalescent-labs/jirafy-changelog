@@ -2,7 +2,7 @@
 > 
 > This is a fork of [onXmaps/jirafy-changelog](https://github.com/onXmaps/jirafy-changelog) with the following changes:
 > 
-> * Upgrade action to Node 24
+> * Upgrade action to Node 20
 > * Upgrade some dependencies
 > * Upgrade CI action to latest stable
 
