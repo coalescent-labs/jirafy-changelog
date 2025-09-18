@@ -1,5 +1,6 @@
 const core = require('@actions/core')
 const github = require('@actions/github')
+const fs = require('fs')
 const { jirafyChangelog } = require('./utils/changelog')
 
 var headRef = core.getInput('head-ref')
@@ -8,6 +9,20 @@ const githubToken = core.getInput('githubToken')
 const octokit = new github.getOctokit(githubToken)
 const { owner, repo } = github.context.repo
 const gitRefRegexp = /^[.A-Za-z0-9_\-\/]+$/
+
+function writeActionOutput(name, value) {
+    const outputPath = process.env.GITHUB_OUTPUT
+    if (!outputPath) {
+        core.warning(`GITHUB_OUTPUT is not defined; cannot set output "${name}".`)
+        return
+    }
+    const delimiter = `EOF_${Math.random().toString(36).slice(2)}`
+    fs.appendFileSync(
+        outputPath,
+        `${name}<<${delimiter}\n${value}\n${delimiter}\n`,
+        { encoding: 'utf8' }
+    )
+}
 
 async function run() {
   try {
@@ -56,7 +71,7 @@ async function run() {
         `Jirafied Changelog:\n${jirafiedChangelog}\n`,
       )
 
-      core.setOutput('changelog', jirafiedChangelog)
+      writeActionOutput('changelog', jirafiedChangelog)
 
     } else {
       core.setFailed('Git ref names must contain one or more numbers, strings, underscores, periods, slashes and dashes.')
