@@ -3,15 +3,25 @@ on:
   push:
     # Sequence of patterns matched against refs/tags
     tags:
-      - 'v*' # Push events to matching v*, i.e., v1.0, v1.0.0
+      - 'v*.*.*' # i.e. v1.0.0; not the moving major tag (v1)
+      - '!v*-*' # pre-releases go to draft-release.yml
 
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       # To use this repository's private action, you must check out the repository
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      # The repo has tags but no prior GitHub release to diff from
+      - name: Previous tag
+        id: previous
+        run: echo "tag=$(git describe --tags --abbrev=0 --match 'v*.*.*' --exclude '*-*' "${{ github.sha }}^")" >> "$GITHUB_OUTPUT"
 
       - name: Jirafy Changelog
         id: changelog
@@ -19,10 +29,12 @@ jobs:
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           jiraHost: ${{ secrets.JIRA_HOST }}
+          head-ref: ${{ github.ref_name }}
+          base-ref: ${{ steps.previous.outputs.tag }}
 
       - name: Create Release
         id: create_release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ github.ref_name }}
@@ -30,3 +42,10 @@ jobs:
           body: ${{ steps.changelog.outputs.changelog }}
           draft: false
           prerelease: false
+
+      # Consumers use the major tag (i.e. @v4): point it at this release
+      - name: Move the major tag
+        run: |
+          major="${GITHUB_REF_NAME%%.*}"
+          git tag -f "$major" "$GITHUB_SHA"
+          git push -f origin "refs/tags/$major"

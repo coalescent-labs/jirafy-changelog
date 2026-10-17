@@ -1,16 +1,17 @@
 {
   "name": "jirafy-changelog",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "Generates a changelog from two references, where the markdown is formatted for any referenced Jira stories.",
   "main": "dist/index.js",
   "scripts": {
     "build": "ncc build ./index.js",
-    "precommit-msg": "echo 'Pre-commit checks...' && exit 0",
     "precommit": "npm run format && npm run build && git add dist/",
     "format-check": "prettier --check **/*.{js,yml,json}",
     "format": "prettier --write **/*.{js,yml,json}",
-    "test": "npx cypress run",
-    "prepare": "husky install"
+    "test": "mocha",
+    "prepare": "husky",
+    "anonymize": "node test/utility/run.js anonymize",
+    "convert": "node test/utility/run.js convert"
   },
   "repository": {
     "type": "git",
@@ -38,10 +39,10 @@
   },
   "devDependencies": {
     "@vercel/ncc": "0.38.0",
-    "cypress": "^15.1.0",
+    "chai": "^6.3.0",
     "dotenv": "^17.2.2",
     "husky": "^9.1.7",
-    "prettier": "2.5.1",
-    "randomstring": "^1.3.1"
+    "mocha": "^11.8.0",
+    "prettier": "2.5.1"
   }
 }
