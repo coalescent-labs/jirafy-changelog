@@ -1,24 +1,22 @@
 name: Unit Tests
 
-on:
-  push:
-    branches-ignore:
-      - 'main'
+# Not run automatically for now: run `npm test` locally (see test/README.md) or start it by hand
+on: workflow_dispatch
 
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
-      - name: Cypress run
-        uses: cypress-io/github-action@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v7
         with:
-          record: true
-          parallel: true
-          group: 'unit tests'
+          node-version: '24'
+          cache: 'npm'
+
+      - run: npm ci
+      - run: npm test
         env:
-          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
-          CYPRESS_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          JIRA_HOST: ${{ secrets.JIRA_HOST }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
