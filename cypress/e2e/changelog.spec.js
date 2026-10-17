@@ -124,6 +124,18 @@ describe('Jirafy Changelog', () => {
             })
         })
 
+        it('ensures CVE ids and version suffixes are not taken for jira tickets', () => {
+            cy.fixture('jirafyChangelog/false-positives/input.md').then((input) => {
+                cy.wrap({ jirafyChangelog })
+                    .invoke('jirafyChangelog', input)
+                    .then((actualChangelog) => {
+                        cy.fixture('jirafyChangelog/false-positives/output.md').then((expectedChangelog) => {
+                            expect(actualChangelog).to.equal(expectedChangelog)
+                        })
+                    })
+            })
+        })
+
         it.skip('[SDET-609] fails if known issues are still present', () => {
             cy.fixture('jirafyChangelog/known-issues/sdet-609/input-sdet-609.md').then((input) => {
                 cy.wrap({ jirafyChangelog })

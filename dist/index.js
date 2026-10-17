@@ -31564,7 +31564,22 @@ module.exports = {
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const core = __nccwpck_require__(2186)
-var jiraHost = core.getInput('jiraHost') || process.env.JIRA_HOST || Cypress.env('TEST_JIRA_HOST')
+var jiraHost =
+  core.getInput('jiraHost') ||
+  process.env.JIRA_HOST ||
+  (typeof Cypress !== 'undefined' ? Cypress.env('TEST_JIRA_HOST') : '')
+
+/**
+ * Regex source matching a Jira ticket (KEY-123). The project comes from the key itself.
+ * A ticket must not follow a letter, "-" or "." nor be followed by another "-<digits>" group, so
+ * CVE-2021-44228, 1.2.3-fork-2 or service-alpha-14.1 are not taken for tickets.
+ * @param {Boolean} anyCase Match lowercase keys too
+ * @returns {String} Regex source
+ */
+function ticketPattern(anyCase = false) {
+  const key = anyCase ? '[a-zA-Z][a-zA-Z0-9]+' : '[A-Z][A-Z0-9]+'
+  return `(?<![A-Za-z_.-])${key}-\\d+(?!-?\\d)`
+}
 
 /**
  * Strips referenced jira tickets that are already surrounded by brackets.
@@ -31577,7 +31592,7 @@ function stripBrackets(changelog) {
 
   try {
     // remove any matched or unmatched bracket adjacent to a JIRA ticket number
-    const regex = /(?:\[?)([A-Z][A-Z0-9]+-\d+)(?:\]?)/g
+    const regex = new RegExp(`(?:\\[?)(${ticketPattern()})(?:\\]?)`, 'g')
     revisedChangelog = changelog.replace(regex, '$1')
   } catch (error) {
     console.log(error)
@@ -31596,7 +31611,7 @@ function toUpperJiraTickets(changelog) {
   let revisedChangelog
 
   try {
-    const regex = /([a-zA-Z][a-zA-Z0-9]+-\d+)/g
+    const regex = new RegExp(`(${ticketPattern(true)})`, 'g')
     revisedChangelog = changelog.replace(regex, (p1) => p1.toUpperCase())
   } catch (error) {
     console.log(error)
@@ -31616,7 +31631,7 @@ function addCommaSpaceBetweenJiraTickets(changelog) {
   let revisedChangelog
 
   try {
-    const regex = /([A-Z][A-Z0-9]+-\d+)[, ]*(?=[A-Z][A-Z0-9]+-\d+)/g
+    const regex = new RegExp(`(${ticketPattern()})[, ]*(?=${ticketPattern()})`, 'g')
 
     revisedChangelog = changelog.replace(regex, '$1, ')
   } catch (error) {
@@ -31637,7 +31652,7 @@ function surroundTicketListWithBrackets(changelog) {
   let revisedChangelog
 
   try {
-    const regex = /((?:[A-Z][A-Z0-9]+-\d+\, )*(?:[A-Z][A-Z0-9]+-\d+))/g
+    const regex = new RegExp(`((?:${ticketPattern()}, )*(?:${ticketPattern()}))`, 'g')
     revisedChangelog = changelog.replace(regex, '[$1]')
   } catch (error) {
     console.log(error)
@@ -31656,7 +31671,7 @@ function addJiraLinksToChangelog(changelog) {
   let revisedChangelog
 
   try {
-    const regex = /([A-Z][A-Z0-9]+-\d+)/g
+    const regex = new RegExp(`(${ticketPattern()})`, 'g')
     revisedChangelog = changelog.replace(regex, `[\`$1\`](https://${jiraHost}/browse/$1)`)
   } catch (error) {
     console.log(error)
