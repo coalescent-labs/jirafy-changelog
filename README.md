@@ -34,6 +34,9 @@ The name of the second branch. Defaults to the `tag_name` of the latest GitHub r
 
 This is your jira domain. (i.e company.atlassian.net)
 
+Any `KEY-123` in a pull request title is linked as a Jira ticket. CVE identifiers such as
+`CVE-2021-44228` are not taken for tickets.
+
 ## Outputs
 
 ### `changelog`
